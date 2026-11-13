@@ -4,12 +4,27 @@ A robust Jakarta EE 10 / JSP web application for managing automotive workshop wo
 
 ---
 
-## 🚀 Quick Start with Docker (Recommended)
+## ⚡ 1-Command Automated Startup (Recommended)
 
-Anyone can run this project locally without installing Java, Maven, or PostgreSQL manually. All dependencies and database tables with sample data are automatically provisioned.
+Since this repository is public, anyone can spin up the full application and PostgreSQL database with **a single terminal command**. No manual git clone or environment setup required!
 
-### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running (Windows / macOS / Linux).
+### For Windows (PowerShell)
+Open PowerShell and run:
+```powershell
+irm https://raw.githubusercontent.com/rowtee/wms/main/run.ps1 | iex
+```
+
+### For macOS / Linux / WSL (Terminal)
+Open Terminal and run:
+```bash
+curl -fsSL https://raw.githubusercontent.com/rowtee/wms/main/run.sh | bash
+```
+
+---
+
+## 🚀 Standard Docker Startup
+
+If you prefer to clone manually:
 
 ### 1. Clone the Repository
 ```bash
@@ -18,25 +33,27 @@ cd wms
 ```
 
 ### 2. Start the Application
-Run the following command in the project root:
 ```bash
 docker compose up --build
 ```
 
 Docker will:
-1. Build the application WAR file using Maven 3.9 and Eclipse Temurin JDK 21 in a clean build container.
-2. Spin up a PostgreSQL 17 container and automatically run [`schema.sql`](file:///C:/Users/User/IdeaProjects/WMS/src/main/resources/schema.sql) to initialize all 6 tables and Malaysian sample data.
+1. Build the application WAR file using Maven 3.9 and Eclipse Temurin JDK 21.
+2. Spin up a PostgreSQL 17 container and automatically run [`schema.sql`](file:///C:/Users/User/IdeaProjects/WMS/src/main/resources/schema.sql) to initialize all 6 tables and Malaysian demo seed data.
 3. Deploy the application into Apache Tomcat 10.1 (Jakarta EE 10).
 4. Expose the web app on port **8080**.
 
-### 3. Access the Application
-Open your web browser and navigate to:
+---
+
+## 🌐 Access the Application
+
+Once started, navigate to:
 - **Root URL**: [http://localhost:8080/](http://localhost:8080/)
 - **Context URL**: [http://localhost:8080/WMS_war/](http://localhost:8080/WMS_war/)
 
 ---
 
-## 🔑 Demo Login Credentials
+## 🔑 Demo Staff Login Accounts
 
 The database is pre-seeded with staff accounts across different workshop roles:
 

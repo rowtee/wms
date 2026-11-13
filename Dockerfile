@@ -2,12 +2,26 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Cache Maven dependencies
-COPY pom.xml ./
-RUN mvn dependency:go-offline -B
+ARG REPO_URL=https://github.com/rowtee/wms.git
+ARG BRANCH=main
 
-# Copy project source and package the WAR artifact
-COPY src ./src
+# Install git
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+# Copy local build context
+COPY . /tmp/build-context/
+
+# Build from local context if pom.xml is present, or automatically clone public GitHub repo
+RUN if [ -f "/tmp/build-context/pom.xml" ]; then \
+        echo "Building from local repository context..."; \
+        cp -r /tmp/build-context/* ./; \
+    else \
+        echo "Local context empty. Cloning directly from public repository ${REPO_URL} (${BRANCH})..."; \
+        git clone --depth 1 --branch ${BRANCH} ${REPO_URL} .; \
+    fi \
+    && rm -rf /tmp/build-context
+
+# Package application WAR
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run application with Apache Tomcat 10.1 (Jakarta EE 10) & Eclipse Temurin JDK 21
