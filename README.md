@@ -4,58 +4,50 @@ A robust Jakarta EE 10 / JSP web application for managing automotive workshop wo
 
 ---
 
-## ⚡ 1-Command Automated Startup (Recommended)
+## 🚀 Quick Start with Docker (Recommended)
 
-Since this repository is public, anyone can spin up the full application and PostgreSQL database with **a single terminal command**. No manual git clone or environment setup required!
+To run this project on any machine, you only need **Docker Desktop**. You do **not** need to install Java, Maven, PostgreSQL, or Apache Tomcat manually.
 
-### For Windows (PowerShell)
-Open PowerShell and run:
+### Step 1: Install & Open Docker Desktop
+1. Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows / macOS / Linux).
+2. Ensure Docker Desktop is **running**.
+
+### Step 2: Run the 1-Command Setup
+
+Open your terminal and run the one-line command:
+
+#### Windows (PowerShell)
 ```powershell
 irm https://raw.githubusercontent.com/rowtee/wms/main/run.ps1 | iex
 ```
 
-### For macOS / Linux / WSL (Terminal)
-Open Terminal and run:
+#### macOS / Linux / WSL (Terminal)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/rowtee/wms/main/run.sh | bash
 ```
 
----
+> **What happens automatically:**
+> 1. Clones the public repository from GitHub into a `./wms` directory (or pulls latest if already present).
+> 2. Builds the WAR file with Maven 3.9 and Eclipse Temurin JDK 21 inside Docker.
+> 3. Starts PostgreSQL 17 and automatically populates all 6 tables and Malaysian demo seed data.
+> 4. Deploys the application onto Apache Tomcat 10.1 (Jakarta EE 10).
+> 5. Exposes the web application on port **8080**.
 
-## 🚀 Standard Docker Startup
-
-If you prefer to clone manually:
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/rowtee/wms.git
-cd wms
-```
-
-### 2. Start the Application
-```bash
-docker compose up --build
-```
-
-Docker will:
-1. Build the application WAR file using Maven 3.9 and Eclipse Temurin JDK 21.
-2. Spin up a PostgreSQL 17 container and automatically run [`schema.sql`](file:///C:/Users/User/IdeaProjects/WMS/src/main/resources/schema.sql) to initialize all 6 tables and Malaysian demo seed data.
-3. Deploy the application into Apache Tomcat 10.1 (Jakarta EE 10).
-4. Expose the web app on port **8080**.
+*(Note: If you have already cloned the repository manually, you can also just run `docker compose up --build` inside the project folder).*
 
 ---
 
 ## 🌐 Access the Application
 
-Once started, navigate to:
-- **Root URL**: [http://localhost:8080/](http://localhost:8080/)
+Once the containers are running, navigate to:
+- **Primary URL**: [http://localhost:8080/](http://localhost:8080/)
 - **Context URL**: [http://localhost:8080/WMS_war/](http://localhost:8080/WMS_war/)
 
 ---
 
 ## 🔑 Demo Staff Login Accounts
 
-The database is pre-seeded with staff accounts across different workshop roles:
+The database comes pre-seeded with staff accounts across different workshop roles:
 
 | Username | Password | Full Name | Role | Department / Specialization |
 | :--- | :--- | :--- | :--- | :--- |
@@ -75,7 +67,7 @@ To stop the containers:
 docker compose down
 ```
 
-To stop and remove persistent database volumes (fresh reset):
+To stop and remove persistent database volumes (fresh database reset):
 ```bash
 docker compose down -v
 ```
