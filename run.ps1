@@ -42,16 +42,34 @@ if (Test-Path -Path "pom.xml" -PathType Leaf) {
     }
 }
 
-# 3. Spin up Docker containers
-Write-Host "[+] Starting WMS and PostgreSQL containers via Docker Compose..." -ForegroundColor Green
+# 3. Detect available web application port (default 8080, fallback to 8081, 8082, etc.)
+function Test-PortInUse([int]$Port) {
+    $connections = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
+    return ($null -ne $connections)
+}
+
+$ChosenPort = 8080
+if (Test-PortInUse $ChosenPort) {
+    Write-Host "[!] Port 8080 is already in use by a local process (e.g. local Tomcat/IDE)." -ForegroundColor Yellow
+    $candidate = 8081
+    while (Test-PortInUse $candidate) {
+        $candidate++
+    }
+    $ChosenPort = $candidate
+    Write-Host "[+] Automatically switching application port to $ChosenPort." -ForegroundColor Green
+}
+$env:APP_PORT = "$ChosenPort"
+
+# 4. Spin up Docker containers
+Write-Host "[+] Starting WMS and PostgreSQL containers via Docker Compose (Port: $ChosenPort)..." -ForegroundColor Green
 docker compose up --build -d
 
-# 4. Display status and credentials
+# 5. Display status and credentials
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host "  WMS is up and running!" -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Green
-Write-Host "  URL: http://localhost:8080/" -ForegroundColor Cyan
+Write-Host "  URL: http://localhost:$ChosenPort/" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Staff Demo Accounts:" -ForegroundColor Yellow
 Write-Host "    - Front Desk:  najwa  / 123456"

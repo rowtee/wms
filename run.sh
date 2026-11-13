@@ -32,16 +32,33 @@ else
     cd "$TARGET_DIR"
 fi
 
-# 3. Spin up Docker containers
-echo "[+] Starting WMS and PostgreSQL containers via Docker Compose..."
+# 3. Detect free port starting from 8080
+CHOSEN_PORT=8080
+is_port_in_use() {
+    (lsof -i :"$1" || nc -z 127.0.0.1 "$1" || ss -tlpn | grep -q ":$1 ") >/dev/null 2>&1
+}
+
+if is_port_in_use $CHOSEN_PORT; then
+    echo "[!] Port 8080 is already in use by a local process."
+    CANDIDATE=8081
+    while is_port_in_use $CANDIDATE; do
+        CANDIDATE=$((CANDIDATE + 1))
+    done
+    CHOSEN_PORT=$CANDIDATE
+    echo "[+] Automatically switching application port to $CHOSEN_PORT."
+fi
+export APP_PORT="$CHOSEN_PORT"
+
+# 4. Spin up Docker containers
+echo "[+] Starting WMS and PostgreSQL containers via Docker Compose (Port: $CHOSEN_PORT)..."
 docker compose up --build -d
 
-# 4. Display status and credentials
+# 5. Display status and credentials
 echo ""
 echo "============================================================"
 echo "  WMS is up and running!"
 echo "============================================================"
-echo "  URL: http://localhost:8080/"
+echo "  URL: http://localhost:$CHOSEN_PORT/"
 echo ""
 echo "  Staff Demo Accounts:"
 echo "    - Front Desk:  najwa  / 123456"
