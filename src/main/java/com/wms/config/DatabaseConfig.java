@@ -108,9 +108,45 @@ public final class DatabaseConfig {
     }
 
     /**
-     * Gets a loaded configuration property.
+     * Gets a loaded configuration property with environment variable override support.
+     * Hierarchy: System Property (-D) > Environment Variable (UPPER_SNAKE_CASE) > database.properties > defaultValue
      */
     public static String getProperty(String key, String defaultValue) {
+        // 1. System property (-Dkey=value)
+        String val = System.getProperty(key);
+        if (val != null && !val.trim().isEmpty()) {
+            return val.trim();
+        }
+
+        // 2. Direct Environment Variable (e.g. db.url -> DB_URL)
+        String envKey = key.replace('.', '_').toUpperCase();
+        val = System.getenv(envKey);
+        if (val != null && !val.trim().isEmpty()) {
+            return val.trim();
+        }
+
+        // 3. Dynamic Docker/Env Aliases
+        if ("db.url".equals(key)) {
+            String dbUrl = System.getenv("DATABASE_URL");
+            if (dbUrl != null && !dbUrl.trim().isEmpty()) return dbUrl.trim();
+
+            String dbHost = System.getenv("DB_HOST");
+            if (dbHost != null && !dbHost.trim().isEmpty()) {
+                String dbPort = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT").trim() : "5432";
+                String dbName = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME").trim() : "wms_db";
+                return "jdbc:postgresql://" + dbHost.trim() + ":" + dbPort + "/" + dbName;
+            }
+        }
+        if ("db.username".equals(key)) {
+            String dbUser = System.getenv("DB_USER");
+            if (dbUser != null && !dbUser.trim().isEmpty()) return dbUser.trim();
+        }
+        if ("db.password".equals(key)) {
+            String dbPass = System.getenv("DB_PASSWORD");
+            if (dbPass != null) return dbPass;
+        }
+
+        // 4. Default from database.properties
         return properties.getProperty(key, defaultValue);
     }
 

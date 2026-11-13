@@ -1,0 +1,14 @@
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+*.ipr
+*.iws
+logs/
+*.log
+.mvn/
+mvnw
+mvnw.cmd
+*.pdf
+.DS_Store
